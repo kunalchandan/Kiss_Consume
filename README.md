@@ -1,4 +1,4 @@
-# Kiss Consume Conpile
+# Kiss Consume
 This is a basic KissComics crawler.
 
 The crawler will:
@@ -18,4 +18,7 @@ You should be able to install all of these with pip or conda, whatever you prefe
 ## Reasoning
 I was far far too lazy to actually download each and every one of these images one at a time and I don't really like the ads on the site, so yeah...
 
+# Disclaimer
+This is purely an educational tool for helping students learn `Selenium` for `Python`.
 
+Use at your own discretion, I do not support piracy.
