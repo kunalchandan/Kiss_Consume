@@ -1,5 +1,4 @@
 from selenium import webdriver
-from selenium.webdriver.support.select import Select
 from webdriver_manager.chrome import ChromeDriverManager
 import urllib.request as req
 import time
@@ -57,14 +56,16 @@ def download_issues(skip: int, title: str):
 
         if len(image_links) == 0:
             print('They don\'t like us anymore, pausing and restarting crawler, hold on')
+            driver.quit()
             return i + skip
 
-        if not os.path.isdir('down/' + issue_links[i][1]):
-            os.mkdir('down/' + issue_links[i][1])
+        output_folder = re.sub(r'[\\/*?:"<>|]', "", issue_links[i][1])
+        if not os.path.isdir('down/' + output_folder):
+            os.mkdir('down/' + output_folder)
 
         # TODO:: Save Images
         for j in range(len(image_links)):
-            req.urlretrieve(str(image_links[j]), 'down/{}/{}.jpg'.format(issue_links[i][1], str(j).zfill(4)))
+            req.urlretrieve(str(image_links[j]), 'down/{}/{}.jpg'.format(output_folder, str(j).zfill(4)))
 
         # TODO:: Zip images into cbz or cbr
         print(issue_links[i])
@@ -73,8 +74,9 @@ def download_issues(skip: int, title: str):
 
 
 def main():
-    title = 'Chew'
-    skip = 60
+    args = define_parser().parse_args()
+    title = args.title
+    skip = args.skip
     incomplete = True
     while incomplete:
         skip = download_issues(skip, title)
