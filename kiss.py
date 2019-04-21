@@ -29,6 +29,10 @@ def define_parser() -> argparse.ArgumentParser:
                      help='title of webcomic, get from the actual link of the comic, '
                           'I might implement searching (probably not)',
                      required=True)
+    parser.add_argument('-H', '--human',
+                        action='store_true',
+                        help='Pause to let you take care of the Google Captcha, '
+                             'you must type anything to resume once you\'ve resolved it.')
     return parser
 
 
@@ -61,7 +65,7 @@ def get_image_links(driver: webdriver) -> Links:
     return np.array(image_links).flatten().tolist()
 
 
-def download_issues(skip: int, title: str):
+def download_issues(skip: int, title: str, human):
     driver = define_driver(title)
     time.sleep(6)
     issue_links = get_links(driver)
@@ -70,19 +74,23 @@ def download_issues(skip: int, title: str):
         os.mkdir('down/')
     for i in range(len(issue_links)):
         driver.get(issue_links[i][0] + '&quality=hq&readType=1')
-        # TODO:: Gather image links
+        # Gathering image links
         image_links = get_image_links(driver)
 
         if len(image_links) == 0:
-            print('They don\'t like us anymore, pausing and restarting crawler, hold on')
-            driver.quit()
-            return i + skip
+            if not human:
+                print('They don\'t like us anymore, pausing and restarting crawler, hold on')
+                driver.quit()
+                return i + skip
+            else:
+                input('Pausing to allow you to take care of captcha')
+                image_links = get_image_links(driver)
 
         output_folder = re.sub(r'[\\/*?:"<>|]', "", issue_links[i][1])
         if not os.path.isdir('down/' + output_folder):
             os.mkdir('down/' + output_folder)
 
-        # TODO:: Save Images
+        # Saving Images
         for j in range(len(image_links)):
             req.urlretrieve(str(image_links[j]), 'down/{}/{}.jpg'.format(output_folder, str(j).zfill(4)))
 
@@ -96,9 +104,10 @@ def main():
     args = define_parser().parse_args()
     title = args.title
     skip = args.skip
+    human = args.human
     incomplete = True
     while incomplete:
-        skip = download_issues(skip, title)
+        skip = download_issues(skip, title, human)
         if skip == -1:
             incomplete = False
         else:
