@@ -13,6 +13,25 @@ Issues_Links = List[Tuple[str, str]]
 Links = List[str]
 
 
+def define_parser() -> argparse.ArgumentParser:
+    # Define CLI Parser arguments
+    parser = argparse.ArgumentParser(
+        description='Kiss Consume (https://github.com/kunalchandan/Kiss_Consume) a webcomic scraper for Kiss Comics the'
+                    ' scraper is purely for educational purposes. Specify the title and the skip(from the top) into the'
+                    ' arguments and watch it slowly download the comics into the folder down/ISSUE_TITLE .')
+    req = parser.add_argument_group('Required Arguments')
+    req.add_argument('-s', '--skip',
+                     help='Skip number of comics from top, default=0',
+                     default=0,
+                     type=int,
+                     required=True)
+    req.add_argument('-t', '--title',
+                     help='title of webcomic, get from the actual link of the comic, '
+                          'I might implement searching (probably not)',
+                     required=True)
+    return parser
+
+
 def define_driver(title: str) -> webdriver:
     base_url = 'https://readcomiconline.to/Comic/'
     driver = webdriver.Chrome(ChromeDriverManager().install())
