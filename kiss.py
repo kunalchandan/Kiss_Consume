@@ -1,9 +1,10 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 import urllib.request as req
+import argparse
+import zipfile
 import time
 import re
-import argparse
 import os
 
 import numpy as np
@@ -65,6 +66,22 @@ def get_image_links(driver: webdriver) -> Links:
     return np.array(image_links).flatten().tolist()
 
 
+def generate_output_folder(output_folder):
+    if not os.path.isdir('down/' + output_folder):
+        os.mkdir('down/' + output_folder)
+
+
+def save_images(image_links, output_folder):
+    for j in range(len(image_links)):
+        req.urlretrieve(str(image_links[j]), 'down/{}/{}.jpg'.format(output_folder, str(j).zfill(4)))
+
+
+def zip_images(path, output_comic):
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            output_comic.write(os.path.join(root, file))
+
+
 def download_issues(skip: int, title: str, human):
     driver = define_driver(title)
     time.sleep(6)
@@ -87,14 +104,13 @@ def download_issues(skip: int, title: str, human):
                 image_links = get_image_links(driver)
 
         output_folder = re.sub(r'[\\/*?:"<>|]', "", issue_links[i][1])
-        if not os.path.isdir('down/' + output_folder):
-            os.mkdir('down/' + output_folder)
-
+        generate_output_folder(output_folder)
         # Saving Images
-        for j in range(len(image_links)):
-            req.urlretrieve(str(image_links[j]), 'down/{}/{}.jpg'.format(output_folder, str(j).zfill(4)))
-
+        save_images(image_links, output_folder)
         # TODO:: Zip images into cbz or cbr
+        output_comic = zipfile.ZipFile(os.path.abspath(output_folder.rstrip('/') + '.cbz'), 'w', zipfile.ZIP_DEFLATED)
+        zip_images(os.path.abspath(output_folder), output_comic)
+        output_comic.close()
         print(issue_links[i])
     driver.quit()
     return -1

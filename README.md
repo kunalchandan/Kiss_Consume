@@ -7,6 +7,7 @@ The crawler will:
 * Save all pages of the issue in sequential order
 * zip/rar into a .cbr or .cbz format
 
+Although not all features have been tested, this crawler is officially complete.
 ## Usage
 
 ```
@@ -27,6 +28,12 @@ Required Arguments:
   -t TITLE, --title TITLE
                         title of webcomic, get from the actual link of the
                         comic, I might implement searching (probably not)
+```
+
+## Example
+
+```
+python3 kiss.py -t Chew
 ```
 
 ## Dependancies
