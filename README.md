@@ -5,9 +5,13 @@ The crawler will:
 * Gather issue links based on a given title
 * Collect all issue links
 * Save all pages of the issue in sequential order
-* zip/rar into a .cbr or .cbz format
+* zip/rar into a .cbr or .cbz format **BROKEN**
 
-Although not all features have been tested, this crawler is officially complete.
+Although not all features have been tested, this crawler is ~~officially~~ **never** complete.
+
+I have also timed the crawler for 60 chapters of 'Tenkuu Shinpan' and it completed the download in ~04:58 minutes, 
+so the average is around 5 seconds per issue, however this would be highly dependant on the quality of the comics and
+your internet connection.
 ## Usage
 
 ```

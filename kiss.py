@@ -1,6 +1,6 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
-import urllib.request as req
+import urllib.request
 import argparse
 import zipfile
 import time
@@ -15,7 +15,6 @@ Links = List[str]
 
 SUPPORTED_SITES = {'comics' : 'https://readcomiconline.to/Comic/',
                    'manga'  : 'https://kissmanga.com/Manga/'}
-#
 
 
 def define_parser() -> argparse.ArgumentParser:
@@ -95,7 +94,12 @@ def generate_output_folder(output_folder):
 
 def save_images(image_links, output_folder):
     for j in range(len(image_links)):
-        req.urlretrieve(str(image_links[j]), 'down/{}/{}.jpg'.format(output_folder, str(j).zfill(4)))
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-Agent',
+                              'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                              'Chrome/36.0.1941.0 Safari/537.36')]
+        urllib.request.install_opener(opener)
+        urllib.request.urlretrieve(str(image_links[j]), 'down/{}/{}.jpg'.format(output_folder, str(j).zfill(4)))
 
 
 def zip_images(path, output_comic):
@@ -125,8 +129,10 @@ def download_issues(site: str, title: str, skip: int, human):
                 input('Pausing to allow you to take care of captcha')
                 image_links = get_image_links(driver, site)
 
-        output_folder = re.sub(r'[\\/*?:"<>|\ ]', "", issue_links[i][1]).replace('..', '_').replace(' ', '-')
+        # Create output location
+        output_folder = re.sub(r'[\\/*?:"<>|]', "", issue_links[i][1]).replace('..', '_').replace(' ', '-')
         generate_output_folder(output_folder)
+
         # Saving Images
         save_images(image_links, output_folder)
         # TODO:: Zip images into cbz or cbr
